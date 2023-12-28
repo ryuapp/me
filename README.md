@@ -1,6 +1,8 @@
+![miru](https://img.ryu.app/logo/miru.png)
+
 ### miru
 
-`miru`(míl) is a cat like command.\
+**miru** is a cat like command.\
 It just prints the contents of one file.
 
 ### Usage
