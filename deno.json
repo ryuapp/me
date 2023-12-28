@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "miru": "cd zig-out; ./miru.exe",
+    "build": "mkdir zig-out; cd zig-out; zig build-exe ../src/main.zig -O ReleaseSmall -target x86_64-windows-msvc --name miru"
+  }
+}
