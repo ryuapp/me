@@ -3,10 +3,10 @@
 ### miru
 
 **miru** is a cat like command.\
-It just prints the contents of one file.
+Just read files and write them to standard output.
 
 ### Usage
 
 ```bash
-miru [FILE]
+miru [FILE]...
 ```
