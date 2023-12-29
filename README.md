@@ -2,7 +2,7 @@
 
 ### miru
 
-**miru** is a cat like command.\
+**miru** is a minimal cat(1) clone for Windows.\
 Just read files and write them to standard output.
 
 ### Usage
