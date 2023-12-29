@@ -19,7 +19,7 @@ pub fn main() !void {
     defer std.process.argsFree(alc, args);
     if (args.len < 2) {
         printUsage();
-        os.exit(1);
+        os.exit(2);
     }
 
     for (args[1..args.len]) |filename| {
