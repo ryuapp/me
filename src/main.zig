@@ -94,15 +94,13 @@ pub fn main() !void {
             const writer = line.writer();
             var line_no: usize = 1;
 
-            const stdout = std.io.getStdOut().writer();
-
             while (reader.streamUntilDelimiter(writer, '\n', null)) : (line_no += 1) {
                 // Clear the line so we can reuse it.
                 defer line.clearRetainingCapacity();
                 try printFileLine(line.items, line_no);
             } else |err| switch (err) {
                 error.EndOfStream => {
-                    try stdout.print("{s}", .{line.items});
+                    try printFileLine(line.items, line_no);
                 },
                 else => {
                     printErrorMessage(filename, err);
