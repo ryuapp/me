@@ -18,7 +18,14 @@ fn printVersion() !void {
     try std.io.getStdOut().writer().print("me {s}", .{VERSION});
 }
 fn printErrorMessage(filename: [:0]u8, err: anyerror) void {
-    debug.print("\"{s}\": {any}\n", .{ filename, err });
+    if (err == error.FileNotFound) {
+        debug.print("me: {s}: No such file or directory\n", .{filename});
+        return;
+    } else if (err == error.IsDir) {
+        debug.print("me: {s}: Is a directory\n", .{filename});
+        return;
+    }
+    debug.print("me: {s}: {any}\n", .{ filename, err });
 }
 
 pub fn main() !void {
