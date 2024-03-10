@@ -8,6 +8,8 @@ const VERSION = "0.1.0";
 const USAGE = "Usage: me [FILE]...";
 const HELP = USAGE ++ "\n --help\t\tPrint help\n --version\tPrint version";
 
+var hasPrinted = false;
+
 fn printUsage() void {
     debug.print("{s}", .{USAGE});
 }
@@ -18,20 +20,26 @@ fn printVersion() !void {
     try std.io.getStdOut().writer().print("me {s}", .{VERSION});
 }
 fn printErrorMessage(filename: [:0]u8, err: anyerror) void {
+    if (hasPrinted) {
+        debug.print("\n", .{});
+    } else {
+        hasPrinted = true;
+    }
     if (err == error.FileNotFound) {
-        debug.print("me: {s}: No such file or directory\n", .{filename});
+        debug.print("me: {s}: No such file or directory", .{filename});
         return;
     } else if (err == error.IsDir) {
-        debug.print("me: {s}: Is a directory\n", .{filename});
+        debug.print("me: {s}: Is a directory", .{filename});
         return;
     }
-    debug.print("me: {s}: {any}\n", .{ filename, err });
+    debug.print("me: {s}: {any}", .{ filename, err });
 }
 
 pub fn main() !void {
-    const alc = std.heap.page_allocator;
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const alc = gpa.allocator();
     const args = try std.process.argsAlloc(alc);
-    var buf: [std.mem.page_size]u8 = undefined;
 
     defer std.process.argsFree(alc, args);
     if (args.len < 2) {
@@ -51,11 +59,39 @@ pub fn main() !void {
     }
 
     for (args[1..args.len]) |filename| {
-        const content = fs.cwd().readFile(filename, &buf) catch |err| {
-            printErrorMessage(filename, err);
-            continue;
-        };
+        if (std.fs.cwd().openFile(filename, .{})) |file| {
+            defer file.close();
 
-        try std.io.getStdOut().writer().print("{s}\n", .{content});
+            var buf_reader = std.io.bufferedReader(file.reader());
+            const reader = buf_reader.reader();
+
+            var line = std.ArrayList(u8).init(alc);
+            defer line.deinit();
+
+            const writer = line.writer();
+            var line_no: usize = 1;
+
+            if (hasPrinted) {
+                try std.io.getStdOut().writer().print("\n", .{});
+            } else {
+                hasPrinted = true;
+            }
+
+            while (reader.streamUntilDelimiter(writer, '\n', null)) : (line_no += 1) {
+                // Clear the line so we can reuse it.
+                defer line.clearRetainingCapacity();
+
+                try std.io.getStdOut().writer().print("{s}\n", .{line.items});
+            } else |err| switch (err) {
+                error.EndOfStream => {
+                    try std.io.getStdOut().writer().print("{s}", .{line.items});
+                },
+                else => {
+                    printErrorMessage(filename, err);
+                },
+            }
+        } else |err| {
+            printErrorMessage(filename, err);
+        }
     }
 }
