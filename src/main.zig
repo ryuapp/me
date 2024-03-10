@@ -4,8 +4,8 @@ const fs = std.fs;
 const os = std.os;
 const debug = std.debug;
 
-const MIRU_VERSION = "0.1.0";
-const USAGE = "Usage: miru [FILE]...";
+const VERSION = "0.1.0";
+const USAGE = "Usage: me [FILE]...";
 const HELP = USAGE ++ "\n --help\t\tPrint help\n --version\tPrint version";
 
 fn printUsage() void {
@@ -15,7 +15,7 @@ fn printHelp() !void {
     try std.io.getStdOut().writer().print("{s}", .{HELP});
 }
 fn printVersion() !void {
-    try std.io.getStdOut().writer().print("miru {s}", .{MIRU_VERSION});
+    try std.io.getStdOut().writer().print("me {s}", .{VERSION});
 }
 fn printErrorMessage(filename: [:0]u8, err: anyerror) void {
     debug.print("\"{s}\": {any}\n", .{ filename, err });
