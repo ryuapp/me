@@ -20,11 +20,7 @@ fn printVersion() !void {
     try std.io.getStdOut().writer().print("me {s}", .{VERSION});
 }
 fn printErrorMessage(filename: [:0]u8, err: anyerror) void {
-    if (hasPrinted) {
-        debug.print("\n", .{});
-    } else {
-        hasPrinted = true;
-    }
+    if (hasPrinted) debug.print("\n", .{}) else hasPrinted = true;
     if (err == error.FileNotFound) {
         debug.print("me: {s}: No such file or directory", .{filename});
         return;
@@ -71,20 +67,18 @@ pub fn main() !void {
             const writer = line.writer();
             var line_no: usize = 1;
 
-            if (hasPrinted) {
-                try std.io.getStdOut().writer().print("\n", .{});
-            } else {
-                hasPrinted = true;
-            }
+            const stdout = std.io.getStdOut().writer();
+
+            if (hasPrinted) try stdout.print("{s}:\n", .{filename}) else hasPrinted = true;
 
             while (reader.streamUntilDelimiter(writer, '\n', null)) : (line_no += 1) {
                 // Clear the line so we can reuse it.
                 defer line.clearRetainingCapacity();
 
-                try std.io.getStdOut().writer().print("{s}\n", .{line.items});
+                try stdout.print("{s}\n", .{line.items});
             } else |err| switch (err) {
                 error.EndOfStream => {
-                    try std.io.getStdOut().writer().print("{s}", .{line.items});
+                    try stdout.print("{s}", .{line.items});
                 },
                 else => {
                     printErrorMessage(filename, err);
