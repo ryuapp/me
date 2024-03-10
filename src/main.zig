@@ -6,20 +6,26 @@ const debug = std.debug;
 
 const VERSION = "0.1.0";
 const USAGE = "Usage: me [FILE]...";
-const HELP = USAGE ++ "\n --help\t\tPrint help\n --version\tPrint version";
+const INFO = "me: try \'me --help\' for more information";
 
 var hasPrinted = false;
+var hasPrintLineNumbers = false;
 
 fn printUsage() void {
-    debug.print("{s}", .{USAGE});
+    debug.print("{s}\n", .{USAGE});
+    debug.print("{s}", .{INFO});
 }
 fn printHelp() !void {
-    try std.io.getStdOut().writer().print("{s}", .{HELP});
+    const stdout = std.io.getStdOut().writer();
+    try stdout.print("{s}\n", .{USAGE});
+    try stdout.print(" -n, --number\t Print number all output lines\n", .{});
+    try stdout.print("     --help\t Print help\n", .{});
+    try stdout.print("     --version\t Print version", .{});
 }
 fn printVersion() !void {
     try std.io.getStdOut().writer().print("me {s}", .{VERSION});
 }
-fn printErrorMessage(filename: [:0]u8, err: anyerror) void {
+fn printErrorMessage(filename: []const u8, err: anyerror) void {
     if (hasPrinted) debug.print("\n", .{}) else hasPrinted = true;
     if (err == error.FileNotFound) {
         debug.print("me: {s}: No such file or directory", .{filename});
@@ -29,6 +35,16 @@ fn printErrorMessage(filename: [:0]u8, err: anyerror) void {
         return;
     }
     debug.print("me: {s}: {any}", .{ filename, err });
+}
+
+fn printFileLine(contents: []const u8, line_no: usize) !void {
+    const stdout = std.io.getStdOut().writer();
+    if (hasPrinted) try stdout.print("\n", .{}) else hasPrinted = true;
+    if (hasPrintLineNumbers) {
+        try stdout.print("{: >5} {s}", .{ line_no, contents });
+    } else {
+        try stdout.print("{s}", .{contents});
+    }
 }
 
 pub fn main() !void {
@@ -43,18 +59,29 @@ pub fn main() !void {
         os.exit(2);
     }
 
+    var filenames = std.ArrayList([]const u8).init(alc);
     // Arguments
-    for (args[1..args.len]) |filename| {
-        if (std.mem.eql(u8, filename, "--help")) {
-            try printHelp();
-            os.exit(0);
-        } else if (std.mem.eql(u8, filename, "--version")) {
-            try printVersion();
-            os.exit(0);
+    for (args[1..args.len]) |arg| {
+        if (std.mem.startsWith(u8, arg, "-")) {
+            if (std.mem.eql(u8, arg, "--help")) {
+                try printHelp();
+                os.exit(0);
+            } else if (std.mem.eql(u8, arg, "--version")) {
+                try printVersion();
+                os.exit(0);
+            } else if (std.mem.eql(u8, arg, "-n") or std.mem.eql(u8, arg, "--number")) {
+                hasPrintLineNumbers = true;
+            } else {
+                debug.print("me: invalid option {s}\n", .{arg});
+                debug.print("{s}", .{INFO});
+                os.exit(2);
+            }
+        } else {
+            try filenames.append(arg);
         }
     }
 
-    for (args[1..args.len]) |filename| {
+    for (filenames.items) |filename| {
         if (std.fs.cwd().openFile(filename, .{})) |file| {
             defer file.close();
 
@@ -69,13 +96,10 @@ pub fn main() !void {
 
             const stdout = std.io.getStdOut().writer();
 
-            if (hasPrinted) try stdout.print("{s}:\n", .{filename}) else hasPrinted = true;
-
             while (reader.streamUntilDelimiter(writer, '\n', null)) : (line_no += 1) {
                 // Clear the line so we can reuse it.
                 defer line.clearRetainingCapacity();
-
-                try stdout.print("{s}\n", .{line.items});
+                try printFileLine(line.items, line_no);
             } else |err| switch (err) {
                 error.EndOfStream => {
                     try stdout.print("{s}", .{line.items});
