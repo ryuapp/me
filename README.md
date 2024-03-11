@@ -3,10 +3,10 @@
 ### me
 
 **me** is a minimal cat(1) clone for Windows.\
-Just read files and write them to standard output.
+Print FILE(s) to standard output.
 
 ### Usage
 
 ```bash
-me [FILE]...
+me [OPTION]... [FILE]...
 ```

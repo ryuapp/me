@@ -6,8 +6,8 @@ const debug = std.debug;
 
 const NAME = "me";
 const VERSION = "0.1.0";
-
-const USAGE = "Usage: " ++ NAME ++ " [FILE]...";
+const USAGE = "Usage: " ++ NAME ++ " [OPTION]... [FILE]...";
+const DESCRIPTION = "Print FILE(s) to standard output.";
 const INFO = NAME ++ ": try \'me --help\' for more information";
 
 var is_printed = false;
@@ -20,6 +20,7 @@ fn printUsage() void {
 fn printHelp() !void {
     const stdout = std.io.getStdOut().writer();
     try stdout.print("{s}\n", .{USAGE});
+    try stdout.print("{s}\n\n", .{DESCRIPTION});
     try stdout.print(" -n, --number\t Print number all output lines\n", .{});
     try stdout.print("     --help\t Print help\n", .{});
     try stdout.print("     --version\t Print version", .{});
