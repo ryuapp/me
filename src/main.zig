@@ -4,12 +4,14 @@ const fs = std.fs;
 const os = std.os;
 const debug = std.debug;
 
+const NAME = "me";
 const VERSION = "0.1.0";
-const USAGE = "Usage: me [FILE]...";
-const INFO = "me: try \'me --help\' for more information";
 
-var hasPrinted = false;
-var hasPrintLineNumbers = false;
+const USAGE = "Usage: " ++ NAME ++ " [FILE]...";
+const INFO = NAME ++ ": try \'me --help\' for more information";
+
+var is_printed = false;
+var has_numbers_flag = false;
 
 fn printUsage() void {
     debug.print("{s}\n", .{USAGE});
@@ -26,21 +28,21 @@ fn printVersion() !void {
     try std.io.getStdOut().writer().print("me {s}", .{VERSION});
 }
 fn printErrorMessage(filename: []const u8, err: anyerror) void {
-    if (hasPrinted) debug.print("\n", .{}) else hasPrinted = true;
+    if (is_printed) debug.print("\n", .{}) else is_printed = true;
     if (err == error.FileNotFound) {
-        debug.print("me: {s}: No such file or directory", .{filename});
+        debug.print("{s}: {s}: No such file or directory", .{ NAME, filename });
         return;
     } else if (err == error.IsDir) {
-        debug.print("me: {s}: Is a directory", .{filename});
+        debug.print("{s}: {s}: Is a directory", .{ NAME, filename });
         return;
     }
-    debug.print("me: {s}: {any}", .{ filename, err });
+    debug.print("{s}: {s}: {any}", .{ NAME, filename, err });
 }
 
 fn printFileLine(contents: []const u8, line_no: usize) !void {
     const stdout = std.io.getStdOut().writer();
-    if (hasPrinted) try stdout.print("\n", .{}) else hasPrinted = true;
-    if (hasPrintLineNumbers) {
+    if (is_printed) try stdout.print("\n", .{}) else is_printed = true;
+    if (has_numbers_flag) {
         try stdout.print("{: >5} {s}", .{ line_no, contents });
     } else {
         try stdout.print("{s}", .{contents});
@@ -70,9 +72,9 @@ pub fn main() !void {
                 try printVersion();
                 os.exit(0);
             } else if (std.mem.eql(u8, arg, "-n") or std.mem.eql(u8, arg, "--number")) {
-                hasPrintLineNumbers = true;
+                has_numbers_flag = true;
             } else {
-                debug.print("me: invalid option {s}\n", .{arg});
+                debug.print("{s}: invalid option {s}\n", .{ NAME, arg });
                 debug.print("{s}", .{INFO});
                 os.exit(2);
             }
