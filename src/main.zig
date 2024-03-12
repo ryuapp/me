@@ -1,3 +1,4 @@
+// Copyright (C) 2023-2024 ryu. All rights reserved. MIT license.
 const std = @import("std");
 
 const fs = std.fs;

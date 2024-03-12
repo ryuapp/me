@@ -1,3 +1,4 @@
+// Copyright (C) 2023-2024 ryu. All rights reserved. MIT license.
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
