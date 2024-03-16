@@ -1,5 +1,6 @@
 // Copyright (C) 2023-2024 ryu. All rights reserved. MIT license.
 const std = @import("std");
+const cat = @import("cat.zig").cat;
 
 const fs = std.fs;
 const os = std.os;
@@ -11,7 +12,6 @@ const USAGE = "Usage: " ++ NAME ++ " [OPTION]... [FILE]...";
 const DESCRIPTION = "Print FILE(s) to standard output.";
 const INFO = NAME ++ ": try \'me --help\' for more information";
 
-var is_printed = false;
 var has_numbers_flag = false;
 
 fn printUsage() void {
@@ -29,27 +29,6 @@ fn printHelp() !void {
 fn printVersion() !void {
     try std.io.getStdOut().writer().print("me {s}", .{VERSION});
 }
-fn printErrorMessage(filename: []const u8, err: anyerror) void {
-    if (is_printed) debug.print("\n", .{}) else is_printed = true;
-    if (err == error.FileNotFound) {
-        debug.print("{s}: {s}: No such file or directory", .{ NAME, filename });
-        return;
-    } else if (err == error.IsDir) {
-        debug.print("{s}: {s}: Is a directory", .{ NAME, filename });
-        return;
-    }
-    debug.print("{s}: {s}: {any}", .{ NAME, filename, err });
-}
-
-fn printFileLine(contents: []const u8, line_no: usize) !void {
-    const stdout = std.io.getStdOut().writer();
-    if (is_printed) try stdout.print("\n", .{}) else is_printed = true;
-    if (has_numbers_flag) {
-        try stdout.print("{: >5} {s}", .{ line_no, contents });
-    } else {
-        try stdout.print("{s}", .{contents});
-    }
-}
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -63,7 +42,7 @@ pub fn main() !void {
         os.exit(2);
     }
 
-    var filenames = std.ArrayList([]const u8).init(alc);
+    var files = std.ArrayList([]const u8).init(alc);
     // Arguments
     for (args[1..args.len]) |arg| {
         if (std.mem.startsWith(u8, arg, "-")) {
@@ -81,37 +60,11 @@ pub fn main() !void {
                 os.exit(2);
             }
         } else {
-            try filenames.append(arg);
+            try files.append(arg);
         }
     }
-
-    for (filenames.items) |filename| {
-        if (std.fs.cwd().openFile(filename, .{})) |file| {
-            defer file.close();
-
-            var buf_reader = std.io.bufferedReader(file.reader());
-            const reader = buf_reader.reader();
-
-            var line = std.ArrayList(u8).init(alc);
-            defer line.deinit();
-
-            const writer = line.writer();
-            var line_no: usize = 1;
-
-            while (reader.streamUntilDelimiter(writer, '\n', null)) : (line_no += 1) {
-                // Clear the line so we can reuse it.
-                defer line.clearRetainingCapacity();
-                try printFileLine(line.items, line_no);
-            } else |err| switch (err) {
-                error.EndOfStream => {
-                    try printFileLine(line.items, line_no);
-                },
-                else => {
-                    printErrorMessage(filename, err);
-                },
-            }
-        } else |err| {
-            printErrorMessage(filename, err);
-        }
+    for (files.items) |filename| {
+        try cat(filename);
     }
+    files.deinit();
 }
