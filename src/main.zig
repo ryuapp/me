@@ -12,8 +12,6 @@ const USAGE = "Usage: " ++ NAME ++ " [OPTION]... [FILE]...";
 const DESCRIPTION = "Print FILE(s) to standard output.";
 const INFO = NAME ++ ": try \'me --help\' for more information";
 
-var has_numbers_flag = false;
-
 fn printUsage() void {
     debug.print("{s}\n", .{USAGE});
     debug.print("{s}", .{INFO});
@@ -44,6 +42,7 @@ pub fn main() !void {
 
     var files = std.ArrayList([]const u8).init(alc);
     // Arguments
+    var has_numbers_flag = false;
     for (args[1..args.len]) |arg| {
         if (std.mem.startsWith(u8, arg, "-")) {
             if (std.mem.eql(u8, arg, "--help")) {
@@ -64,7 +63,7 @@ pub fn main() !void {
         }
     }
     for (files.items) |filename| {
-        try cat(filename);
+        try cat(filename, .{ .number = has_numbers_flag });
     }
     files.deinit();
 }
