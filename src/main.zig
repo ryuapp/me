@@ -3,7 +3,6 @@ const std = @import("std");
 const cat = @import("cat.zig").cat;
 
 const fs = std.fs;
-const os = std.os;
 const debug = std.debug;
 
 const NAME = "me";
@@ -28,16 +27,25 @@ fn printVersion() !void {
     try std.io.getStdOut().writer().print("me {s}", .{VERSION});
 }
 
+fn exit(code: u8, cp: c_uint) void {
+    _ = std.os.windows.kernel32.SetConsoleOutputCP(cp);
+    std.os.exit(code);
+}
+
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
     const args = try std.process.argsAlloc(alc);
 
+    // Set console output code page to UTF-8
+    const default_cp = std.os.windows.kernel32.GetConsoleOutputCP();
+    _ = std.os.windows.kernel32.SetConsoleOutputCP(65001);
+
     defer std.process.argsFree(alc, args);
     if (args.len < 2) {
         printUsage();
-        os.exit(2);
+        exit(2, default_cp);
     }
 
     var files = std.ArrayList([]const u8).init(alc);
@@ -47,16 +55,16 @@ pub fn main() !void {
         if (std.mem.startsWith(u8, arg, "-")) {
             if (std.mem.eql(u8, arg, "--help")) {
                 try printHelp();
-                os.exit(0);
+                exit(0, default_cp);
             } else if (std.mem.eql(u8, arg, "--version")) {
                 try printVersion();
-                os.exit(0);
+                exit(0, default_cp);
             } else if (std.mem.eql(u8, arg, "-n") or std.mem.eql(u8, arg, "--number")) {
                 has_numbers_flag = true;
             } else {
                 debug.print("{s}: invalid option {s}\n", .{ NAME, arg });
                 debug.print("{s}", .{INFO});
-                os.exit(2);
+                exit(2, default_cp);
             }
         } else {
             try files.append(arg);
@@ -66,4 +74,5 @@ pub fn main() !void {
         try cat(filename, .{ .number = has_numbers_flag });
     }
     files.deinit();
+    exit(0, default_cp);
 }
