@@ -27,13 +27,10 @@ fn printErrorMessage(filename: []const u8, err: anyerror) void {
     debug.print("{s}: {s}: {any}", .{ NAME, filename, err });
 }
 
-pub fn cat(filename: []const u8, options: anytype) !void {
+pub fn cat(alc: std.mem.Allocator, filename: []const u8, options: anytype) !void {
     if (options.number) {
         has_numbers_flag = true;
     }
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer _ = gpa.deinit();
-    const alc = gpa.allocator();
 
     if (std.fs.cwd().openFile(filename, .{})) |file| {
         defer file.close();
