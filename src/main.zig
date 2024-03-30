@@ -76,3 +76,7 @@ pub fn main() !void {
     files.deinit();
     exit(0, default_cp);
 }
+
+test {
+    _ = @import("cat.zig");
+}
