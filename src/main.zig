@@ -71,7 +71,7 @@ pub fn main() !void {
         }
     }
     for (files.items) |filename| {
-        try cat(filename, .{ .number = has_numbers_flag });
+        try cat(alc, filename, .{ .number = has_numbers_flag });
     }
     files.deinit();
     exit(0, default_cp);
