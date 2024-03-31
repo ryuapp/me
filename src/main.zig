@@ -6,7 +6,7 @@ const fs = std.fs;
 const debug = std.debug;
 
 const NAME = "me";
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 const USAGE = "Usage: " ++ NAME ++ " [OPTION]... [FILE]...";
 const DESCRIPTION = "Print FILE(s) to standard output.";
 const INFO = NAME ++ ": try \'me --help\' for more information";
