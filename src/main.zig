@@ -4,6 +4,7 @@ const cat = @import("cat.zig").cat;
 
 const fs = std.fs;
 const debug = std.debug;
+const is_windows = @import("builtin").os.tag == .windows;
 
 const NAME = "me";
 const VERSION = "0.1.1";
@@ -28,7 +29,9 @@ fn printVersion() !void {
 }
 
 fn exit(code: u8, cp: c_uint) void {
-    _ = std.os.windows.kernel32.SetConsoleOutputCP(cp);
+    if (comptime is_windows) {
+        _ = std.os.windows.kernel32.SetConsoleOutputCP(cp);
+    }
     std.os.exit(code);
 }
 
@@ -39,8 +42,11 @@ pub fn main() !void {
     const args = try std.process.argsAlloc(alc);
 
     // Set console output code page to UTF-8
-    const default_cp = std.os.windows.kernel32.GetConsoleOutputCP();
-    _ = std.os.windows.kernel32.SetConsoleOutputCP(65001);
+    var default_cp: c_uint = 65001;
+    if (comptime is_windows) {
+        default_cp = std.os.windows.kernel32.GetConsoleOutputCP();
+        _ = std.os.windows.kernel32.SetConsoleOutputCP(65001);
+    }
 
     defer std.process.argsFree(alc, args);
     if (args.len < 2) {
