@@ -18,11 +18,13 @@ fn printUsage() void {
 }
 fn printHelp() !void {
     const stdout = std.io.getStdOut().writer();
-    try stdout.print("{s}\n", .{USAGE});
-    try stdout.print("{s}\n\n", .{DESCRIPTION});
-    try stdout.print(" -n, --number\t Print number all output lines\n", .{});
-    try stdout.print("     --help\t Print help\n", .{});
-    try stdout.print("     --version\t Print version", .{});
+    const options =
+        \\  -n, --number   Print number all output lines
+        \\      --help     Print help
+        \\      --version  Print version
+    ;
+
+    try stdout.print("{s}\n{s}\n\n{s}", .{ USAGE, DESCRIPTION, options });
 }
 fn printVersion() !void {
     try std.io.getStdOut().writer().print("me {s}", .{VERSION});
