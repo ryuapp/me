@@ -34,9 +34,9 @@ fn printVersion() !void {
 }
 
 fn exit(code: u8) void {
-    if (comptime is_windows) {
+    if (comptime is_windows)
         _ = std.os.windows.kernel32.SetConsoleOutputCP(default_cp);
-    }
+
     std.os.exit(code);
 }
 
