@@ -10,7 +10,7 @@ const debug = std.debug;
 const is_windows = @import("builtin").os.tag == .windows;
 
 const NAME = "me";
-const VERSION = "0.1.1";
+const VERSION = "0.1.2";
 const USAGE = "Usage: " ++ NAME ++ " [OPTION]... [FILE]...";
 const DESCRIPTION = "Print FILE(s) to standard output.";
 const INFO = NAME ++ ": try \'me --help\' for more information";
