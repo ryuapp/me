@@ -41,8 +41,11 @@ pub fn main() !void {
     try Output.init();
 
     defer std.process.argsFree(alc, args);
-    if (args.len < 2)
+    if (args.len < 2) {
         printUsage();
+        Output.restore();
+        os.exit(2);
+    }
 
     var files = std.ArrayList([]const u8).init(alc);
     // Arguments
