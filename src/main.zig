@@ -4,10 +4,8 @@ const Output = @import("output.zig").Output;
 const cat = @import("cat.zig").cat;
 
 const os = std.os;
-const fs = std.fs;
 const mem = std.mem;
 const debug = std.debug;
-const is_windows = @import("builtin").os.tag == .windows;
 
 const NAME = "me";
 const VERSION = "0.1.2";
@@ -20,14 +18,12 @@ fn printUsage() void {
     debug.print("{s}", .{INFO});
 }
 fn printHelp() !void {
-    const stdout = std.io.getStdOut().writer();
     const options =
         \\  -n, --number   Print number all output lines
         \\      --help     Print help
         \\      --version  Print version
     ;
-
-    try stdout.print("{s}\n{s}\n\n{s}", .{ USAGE, DESCRIPTION, options });
+    try std.io.getStdOut().writer().print("{s}\n{s}\n\n{s}", .{ USAGE, DESCRIPTION, options });
 }
 fn printVersion() !void {
     try std.io.getStdOut().writer().print("me {s}", .{VERSION});

@@ -37,7 +37,7 @@ const WindowsOutput = struct {
         try win.SetConsoleCtrlHandler(handler_routine, true);
     }
     fn abortSignalHandler() void {
-        WindowsOutput.restore();
+        restore();
         os.exit(0);
     }
 
