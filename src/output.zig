@@ -1,8 +1,8 @@
 // Copyright (C) 2023-2024 ryu. All rights reserved. MIT license.
 const std = @import("std");
-const os = std.os;
+const builtin = @import("builtin");
 
-const is_windows = @import("builtin").os.tag == .windows;
+const is_windows = builtin.os.tag == .windows;
 
 pub const Output = struct {
     pub fn init() !void {
@@ -17,7 +17,7 @@ pub const Output = struct {
     }
 };
 const WindowsOutput = struct {
-    const win = os.windows;
+    const win = std.os.windows;
     const k32 = win.kernel32;
     var console_output_cp: c_uint = @as(u32, 0);
 
@@ -38,7 +38,7 @@ const WindowsOutput = struct {
     }
     fn abortSignalHandler() void {
         restore();
-        os.exit(0);
+        std.process.exit(0);
     }
 
     pub fn init() !void {
