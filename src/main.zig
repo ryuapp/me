@@ -3,9 +3,9 @@ const std = @import("std");
 const Output = @import("output.zig").Output;
 const cat = @import("cat.zig").cat;
 
-const os = std.os;
 const mem = std.mem;
 const debug = std.debug;
+const process = std.process;
 
 const NAME = "me";
 const VERSION = "0.1.2";
@@ -32,15 +32,15 @@ pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
-    const args = try std.process.argsAlloc(alc);
+    const args = try process.argsAlloc(alc);
 
     try Output.init();
 
-    defer std.process.argsFree(alc, args);
+    defer process.argsFree(alc, args);
     if (args.len < 2) {
         printUsage();
         Output.restore();
-        os.exit(2);
+        process.exit(2);
     }
 
     var files = std.ArrayList([]const u8).init(alc);
@@ -64,9 +64,9 @@ pub fn main() !void {
 
             Output.restore();
             if (is_invalid_options) {
-                os.exit(2);
+                process.exit(2);
             } else {
-                os.exit(0);
+                process.exit(0);
             }
         } else {
             try files.append(arg);
@@ -78,7 +78,7 @@ pub fn main() !void {
     files.deinit();
 
     Output.restore();
-    os.exit(0);
+    process.exit(0);
 }
 
 test {
