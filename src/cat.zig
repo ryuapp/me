@@ -60,7 +60,7 @@ test "read a file" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
-    const filename = "test/hello.txt";
+    const filename = "src/testdata/hello.txt";
     const options = .{ .number = false };
     try cat(alc, filename, options);
 }
@@ -70,7 +70,7 @@ test "read a file with line numbers" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
-    const filename = "test/hello.txt";
+    const filename = "src/testdata/hello.txt";
     const options = .{ .number = true };
     try cat(alc, filename, options);
 }
@@ -80,7 +80,7 @@ test "read a japanaese file" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
-    const filename = "test/hello_ja.txt";
+    const filename = "src/testdata/hello_ja.txt";
     const options = .{ .number = false };
     try cat(alc, filename, options);
 }
@@ -90,7 +90,7 @@ test "read a japanaese file with line numbers" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
-    const filename = "test/hello_ja.txt";
+    const filename = "src/testdata/hello_ja.txt";
     const options = .{ .number = true };
     try cat(alc, filename, options);
 }
