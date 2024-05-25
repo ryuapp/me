@@ -10,3 +10,10 @@ Print FILE(s) to standard output.
 ```bash
 me [OPTION]... [FILE]...
 ```
+
+### Installation
+
+[Scoop](https://scoop.sh/):
+```bash
+scoop install https://raw.githubusercontent.com/ryuapp/me/main/me.json
+```
