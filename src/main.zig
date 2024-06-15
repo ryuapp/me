@@ -8,7 +8,7 @@ const debug = std.debug;
 const process = std.process;
 
 const NAME = "me";
-const VERSION = "0.1.3";
+const VERSION = "0.1.4";
 const USAGE = "Usage: " ++ NAME ++ " [OPTION]... [FILE]...";
 const DESCRIPTION = "Print FILE(s) to standard output.";
 const INFO = NAME ++ ": try \'me --help\' for more information";
