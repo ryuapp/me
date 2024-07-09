@@ -8,7 +8,7 @@ var has_numbers_flag = false;
 
 fn printFileLine(contents: []const u8, line_no: usize) !void {
     const stdout = std.io.getStdOut().writer();
-    if (is_printed) debug.print("\n", .{}) else is_printed = true;
+    if (is_printed) try std.io.getStdErr().writer().print("\n", .{}) else is_printed = true;
 
     if (has_numbers_flag) {
         try stdout.print("{: >5} {s}", .{ line_no, contents });
@@ -16,13 +16,13 @@ fn printFileLine(contents: []const u8, line_no: usize) !void {
         try stdout.print("{s}", .{contents});
     }
 }
-fn printErrorMessage(filename: []const u8, err: anyerror) void {
-    if (is_printed) debug.print("\n", .{}) else is_printed = true;
+fn printErrorMessage(filename: []const u8, err: anyerror) !void {
+    if (is_printed) try std.io.getStdErr().writer().print("\n", .{}) else is_printed = true;
 
     switch (err) {
-        error.FileNotFound => debug.print("{s}: {s}: No such file or directory", .{ NAME, filename }),
-        error.IsDir => debug.print("{s}: {s}: Is a directory", .{ NAME, filename }),
-        else => debug.print("{s}: {s}: {any}", .{ NAME, filename, err }),
+        error.FileNotFound => try std.io.getStdErr().writer().print("{s}: {s}: No such file or directory", .{ NAME, filename }),
+        error.IsDir => try std.io.getStdErr().writer().print("{s}: {s}: Is a directory", .{ NAME, filename }),
+        else => try std.io.getStdErr().writer().print("{s}: {s}: {any}", .{ NAME, filename, err }),
     }
 }
 
@@ -48,15 +48,15 @@ pub fn cat(alc: std.mem.Allocator, filename: []const u8, options: anytype) !void
             try printFileLine(line.items, line_no);
         } else |err| switch (err) {
             error.EndOfStream => try printFileLine(line.items, line_no),
-            else => printErrorMessage(filename, err),
+            else => try printErrorMessage(filename, err),
         }
     } else |err| {
-        printErrorMessage(filename, err);
+        try printErrorMessage(filename, err);
     }
 }
 
 test "read a file" {
-    debug.print("\n", .{});
+    try std.io.getStdErr().writer().print("\n", .{});
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
@@ -66,7 +66,7 @@ test "read a file" {
 }
 
 test "read a file with line numbers" {
-    debug.print("\n", .{});
+    try std.io.getStdErr().writer().print("\n", .{});
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
@@ -76,7 +76,7 @@ test "read a file with line numbers" {
 }
 
 test "read a japanaese file" {
-    debug.print("\n", .{});
+    try std.io.getStdErr().writer().print("\n", .{});
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
@@ -86,7 +86,7 @@ test "read a japanaese file" {
 }
 
 test "read a japanaese file with line numbers" {
-    debug.print("\n", .{});
+    try std.io.getStdErr().writer().print("\n", .{});
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
