@@ -56,7 +56,7 @@ pub fn cat(alc: std.mem.Allocator, filename: []const u8, options: anytype) !void
 }
 
 test "read a file" {
-    try std.io.getStdErr().writer().print("\n", .{});
+    debug.print("\n", .{});
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
@@ -66,7 +66,7 @@ test "read a file" {
 }
 
 test "read a file with line numbers" {
-    try std.io.getStdErr().writer().print("\n", .{});
+    debug.print("\n", .{});
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
@@ -76,7 +76,7 @@ test "read a file with line numbers" {
 }
 
 test "read a japanaese file" {
-    try std.io.getStdErr().writer().print("\n", .{});
+    debug.print("\n", .{});
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
@@ -86,7 +86,7 @@ test "read a japanaese file" {
 }
 
 test "read a japanaese file with line numbers" {
-    try std.io.getStdErr().writer().print("\n", .{});
+    debug.print("\n", .{});
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const alc = gpa.allocator();
