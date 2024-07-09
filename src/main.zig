@@ -13,9 +13,9 @@ const USAGE = "Usage: " ++ NAME ++ " [OPTION]... [FILE]...";
 const DESCRIPTION = "Print FILE(s) to standard output.";
 const INFO = NAME ++ ": try \'me --help\' for more information";
 
-fn printUsage() void {
-    debug.print("{s}\n", .{USAGE});
-    debug.print("{s}", .{INFO});
+fn printUsage() !void {
+    try std.io.getStdErr().writer().print("{s}\n", .{USAGE});
+    try std.io.getStdErr().writer().print("{s}", .{INFO});
 }
 fn printHelp() !void {
     const options =
@@ -38,7 +38,7 @@ pub fn main() !void {
 
     defer process.argsFree(alc, args);
     if (args.len < 2) {
-        printUsage();
+        try printUsage();
         Output.restore();
         process.exit(2);
     }
@@ -57,8 +57,8 @@ pub fn main() !void {
             } else if (mem.eql(u8, arg, "--version")) {
                 try printVersion();
             } else {
-                debug.print("{s}: invalid option {s}\n", .{ NAME, arg });
-                debug.print("{s}", .{INFO});
+                try std.io.getStdErr().writer().print("{s}: invalid option {s}\n", .{ NAME, arg });
+                try std.io.getStdErr().writer().print("{s}", .{INFO});
                 is_invalid_options = true;
             }
 
