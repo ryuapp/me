@@ -1,5 +1,12 @@
 .{
     .name = "me",
     .version = "0.1.4",
-    .paths = .{""},
+    .dependencies = .{},
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "LICENSE",
+        "README.md",
+    },
 }
